@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// A person
 type Person struct {
 	ID        string   `json:"id,omitempty"`
 	Firstname string   `json:"firstname,omitempty"`
@@ -15,6 +16,7 @@ type Person struct {
 	Address   *Address `json:"address,omitempty"`
 }
 
+// A person's address
 type Address struct {
 	City  string `json:"city,omitempty"`
 	State string `json:"state,omitempty"`
@@ -23,17 +25,26 @@ type Address struct {
 var people []Person
 
 func main() {
+	setupPeople()
+
+	router := setupRouter()
+
+	log.Fatal(http.ListenAndServe(":8000", router))
+}
+
+func setupPeople() {
 	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
 	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Y", State: "State Y"}})
 	people = append(people, Person{ID: "3", Firstname: "Francis", Lastname: "Sunday", Address: &Address{City: "City Z", State: "State Z"}})
+}
 
+func setupRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/people", getPeople).Methods("GET")
 	router.HandleFunc("/people/{id}", getPerson).Methods("GET")
 	router.HandleFunc("/people/{id}", createPerson).Methods("POST")
 	router.HandleFunc("/people/{id}", deletePerson).Methods("DELETE")
-
-	log.Fatal(http.ListenAndServe(":8000", router))
+	return router
 }
 
 func getPeople(w http.ResponseWriter, r *http.Request) {
