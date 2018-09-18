@@ -49,7 +49,10 @@ func setupRouter() *mux.Router {
 
 func getPeople(w http.ResponseWriter, r *http.Request) {
 	log.Println("getPeople")
-	json.NewEncoder(w).Encode(people)
+	err := json.NewEncoder(w).Encode(people)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func getPerson(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +64,8 @@ func getPerson(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	json.NewEncoder(w).Encode(people)
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("404"))
 }
 
 func createPerson(w http.ResponseWriter, r *http.Request) {
